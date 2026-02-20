@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Chatbot Gemini</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; height: 90vh; padding: 20px; }
+        #chat-box { flex: 1; border: 1px solid #ccc; overflow-y: auto; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+        .user { color: blue; font-weight: bold; }
+        .bot { color: green; font-weight: bold; }
+        input { padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Chatbot Gemini 🚀</h2>
+    <div id="chat-box"></div>
+    <div style="display:flex;">
+        <input type="text" id="user-input" placeholder="Posez une question..." style="flex:1;">
+        <button onclick="sendMessage()">Envoyer</button>
+    </div>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        const API_KEY = "AIzaSyCMmzUoCW448urFjzNoLAbwNIK7P8MRTuM"; 
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            if (!input.value) return;
+
+            // Afficher message utilisateur
+            chatBox.innerHTML += `<p class="user">Vous: ${input.value}</p>`;
+            const prompt = input.value;
+            input.value = '';
+
+            try {
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const text = response.text();
+                // Afficher réponse du bot
+                chatBox.innerHTML += `<p class="bot">Gemini: ${text}</p>`;
+            } catch (error) {
+                chatBox.innerHTML += `<p style="color:red;">Erreur: ${error.message}</p>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
